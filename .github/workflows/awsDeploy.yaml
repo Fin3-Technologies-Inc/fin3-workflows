@@ -12,6 +12,10 @@ on:
       helm_value_file_from_env_dir:
         required: true
         type: string
+      namespace_name:
+        required: true
+        type: string
+
     secrets:
       fin3_github_token:
         required: true
