@@ -1,0 +1,51 @@
+name: Deploy
+
+on:
+  workflow_call:
+    inputs:
+      helm_release_name:
+        required: true
+        type: string
+      helm_chart_name:
+        required: true
+        type: string
+      helm_value_file_from_env_dir:
+        required: true
+        type: string
+    secrets:
+      fin3_github_token:
+        required: true
+      aws_fin3_account_id:
+        required: true
+      kube_config:
+        required: true
+      aws_access_key:
+        required: true
+      aws_secret_key:
+        required: true
+
+env:
+  AWS_DEFAULT_REGION: us-east-1
+  AWS_DEFAULT_OUTPUT: json
+  AWS_ACCOUNT_ID: ${{ secrets.aws_fin3_account_id }}
+
+jobs:
+  aws_deploy:
+    name: Deploy
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v1
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-access-key-id: ${{ secrets.aws_access_key }}
+          aws-secret-access-key: ${{ secrets.aws_secret_key }}
+          aws-region: us-east-1
+      - name: helm deploy
+        uses: koslib/helm-eks-action@master
+        env:
+          KUBE_CONFIG_DATA: ${{ secrets.kube_config }}
+        with:
+          command: |
+            helm repo add --username ${{ secrets.fin3_github_token }} --password ${{ secrets.fin3_github_token }} fin3-helm 'https://raw.githubusercontent.com/Fin3-Technologies-Inc/fin3-helm/main/' &&
+            helm upgrade --install ${{ inputs.helm_release_name }} fin3-helm/${{ inputs.helm_chart_name }} -f .github/helm/envs/${{ inputs.helm_value_file_from_env_dir }} -n ${{ inputs.namespace_name }}

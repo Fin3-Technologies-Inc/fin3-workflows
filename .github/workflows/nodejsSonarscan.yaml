@@ -1,0 +1,32 @@
+name: Sonarscan
+on:
+  workflow_call:
+    secrets:
+      sonar_token:
+        required: true
+      fin3_github_token:
+        required: true
+jobs:
+  sonarcloud:
+    name: CodeScan (Sonar Cloud)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          # Disabling shallow clone is recommended for improving relevancy of reporting
+          fetch-depth: 0
+      - uses: actions/setup-node@v2
+        with:
+          node-version: "15"
+
+      - name: Node install dependencies
+        run: npm install
+
+      - name: Run unit tests
+        run: npm run test
+
+      - name: SonarCloud Scan
+        uses: sonarsource/sonarcloud-github-action@master
+        env:
+          GITHUB_TOKEN: ${{ secrets.fin3_github_token }}
+          SONAR_TOKEN: ${{ secrets.sonar_token }}
