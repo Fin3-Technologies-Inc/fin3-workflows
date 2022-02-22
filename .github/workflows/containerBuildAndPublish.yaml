@@ -25,15 +25,13 @@ jobs:
 
     steps:
       - uses: actions/checkout@v2
-
-      - name: Prepare
-        id: prep
+      - name: Set the tag
         run: |
-          if [[ -z "${{ inputs.tag }}" ]]
-          then 
-            echo "final-tag=latest" >> $GITHUB_ENV
+          if [ -z "${{inputs.tag}}" ]
+          then
+            echo "final_tag=latest" >> $GITHUB_ENV
           else
-            echo "final-tag=${{ inputs.tag }}" >> $GITHUB_ENV
+            echo "final_tag=${{inputs.tag}}" >> $GITHUB_ENV
           fi
 
       - name: Set up Docker Buildx
@@ -54,4 +52,4 @@ jobs:
           file: Dockerfile
           context: .
           push: true
-          tags: fin3technologies/${{ inputs.image_name }}:${{ inputs.tag }}
+          tags: fin3technologies/${{ inputs.image_name }}:${{ env.final_tag }}
