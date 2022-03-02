@@ -51,5 +51,5 @@ jobs:
           KUBE_CONFIG_DATA: ${{ secrets.kube_config }}
         with:
           command: |
-            helm repo add --username ${{ secrets.fin3_github_token }} --password ${{ secrets.fin3_github_token }} fin3-helm 'https://raw.githubusercontent.com/Fin3-Technologies-Inc/fin3-helm/gh-pages/' &&
+            helm repo add --username ${{ secrets.fin3_github_token }} --password ${{ secrets.fin3_github_token }} fin3-helm 'https://raw.githubusercontent.com/Fin3-Technologies-Inc/fin3-helm/main/' &&
             helm upgrade --install ${{ inputs.helm_release_name }} fin3-helm/${{ inputs.helm_chart_name }} -f .github/helm/envs/${{ inputs.helm_value_file_from_env_dir }} -n ${{ inputs.namespace_name }}
