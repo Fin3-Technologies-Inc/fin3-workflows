@@ -25,45 +25,13 @@ jobs:
         uses: gradle/gradle-build-action@937999e9cc2425eddc7fd62d1053baf041147db7
         with:
           arguments: build
+
       - name: Grant Permissions to gradlew
         run: chmod +x gradlew
+
       - name: Test
-        run: ./gradlew test --tests "*"
-      - name: Test Success
-        if: success()
-        uses: actions/github-script@0.2.0
-        with:
-          github-token: ${{ github.token }}
-          script: |
-            const pull_number = "${{github.event.number}}"
-            await github.pulls.createReview({
-              ...context.repo,
-              pull_number,
-              body: "All tests passed.",
-              event: "APPROVE"
-            })
-      - name: Test Fail
-        if: failure()
-        uses: actions/github-script@0.2.0
-        with:
-          github-token: ${{ github.token }}
-          script: |
-            const pull_number = "${{github.event.number}}"
-            await github.pulls.createReview({
-              ...context.repo,
-              pull_number,
-              body: "There is something wrong with test codes.",
-             event: "REQUEST_CHANGES"
-            })
-            await github.pulls.update({
-              ...context.repo,
-              pull_number,
-              state: "closed"
-            })
-      - uses: actions/upload-artifact@v3
-        with:
-          name: Package
-          path: build/libs
+        run: ./gradlew test
+
       - name: SonarCloud Scan
         uses: sonarsource/sonarcloud-github-action@master
         env:
