@@ -1,0 +1,79 @@
+name: Build and Publish
+
+on:
+  workflow_call:
+    inputs:
+      image_name:
+        required: true
+        type: string
+      tag:
+        required: true
+        type: string
+    secrets:
+      dockerhub_user:
+        required: true
+      dockerhub_token:
+        required: true
+        
+jobs:
+  java_build:
+    name: Build Jar
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Set up JDK 11
+        uses: actions/setup-java@v1
+        with:
+          java-version: 11
+          server-id: github # Value of the distributionManagement/repository/id field of the pom.xml
+
+      - name: Build with Gradle
+        run: ./gradlew clean build
+
+      - name: Upload Service Artifact
+        uses: actions/upload-artifact@v2
+        with:
+          name: service
+          path: application/build/libs/application-*-SNAPSHOT.jar
+  
+  docker_build:
+    name: Build and Push to Docker Registry
+    needs: java_build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Set the tag
+        run: |
+          if [ -z "${{inputs.tag}}" ]
+          then
+            echo "final_tag=latest" >> $GITHUB_ENV
+          else
+            echo "final_tag=${{inputs.tag}}" >> $GITHUB_ENV
+          fi
+
+      - name: Set up Docker Buildx
+        id: buildx
+        uses: docker/setup-buildx-action@v1
+        with:
+          install: true
+
+      - name: Login to DockerHub
+        uses: docker/login-action@v1
+        with:
+          username: ${{ secrets.dockerhub_user }}
+          password: ${{ secrets.dockerhub_token }}
+
+      - name: Download Service Artifact
+        uses: actions/download-artifact@v2
+        with:
+          name: service
+          path: service/build/libs
+
+      - name: Build and push service docker
+        uses: docker/build-push-action@v2
+        with:
+          file: docker/Dockerfile-service
+          context: .
+          push: true
+          tags: fin3technologies/${{ inputs.image_name }}:${{ env.final_tag }}
