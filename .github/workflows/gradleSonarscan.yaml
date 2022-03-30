@@ -20,6 +20,12 @@ jobs:
           java-version: '11'
           distribution: 'adopt'
 
+      - name: Login to DockerHub
+        uses: docker/login-action@v1
+        with:
+          username: ${{ secrets.dockerhub_user }}
+          password: ${{ secrets.dockerhub_token }}
+
       - name: Validate Gradle wrapper
         uses: gradle/wrapper-validation-action@e6e38bacfdf1a337459f332974bb2327a31aaf4b
 
