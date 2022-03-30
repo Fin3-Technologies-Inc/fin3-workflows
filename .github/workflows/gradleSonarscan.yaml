@@ -6,6 +6,10 @@ on:
         required: true
       fin3_github_token:
         required: true
+      dockerhub_user:
+        required: true
+      dockerhub_token:
+        required: true        
 jobs:
   sonarcloud:
     name: CodeScan (Sonar Cloud)
