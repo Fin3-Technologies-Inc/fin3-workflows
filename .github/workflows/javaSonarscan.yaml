@@ -25,5 +25,5 @@ jobs:
           SONAR_TOKEN: ${{ secrets.sonar_token }}
         run: |
           mvn -Dsonar.coverage.jacoco.xmlReportPaths=jacoco.xml -Dsonar.host.url="https://sonarcloud.io" clean verify sonar:sonar -Dsonar.login=${SONAR_TOKEN}
-          mvn clean install
+          mvn clean install verify
           mvn sonar:sonar -Dsonar.host.url="https://sonarcloud.io" -Dsonar.login=${SONAR_TOKEN}
