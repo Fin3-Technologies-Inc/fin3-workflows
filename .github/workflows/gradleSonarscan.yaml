@@ -6,6 +6,10 @@ on:
         required: true
       fin3_github_token:
         required: true
+      dockerhub_user:
+        required: true
+      dockerhub_token:
+        required: true        
 jobs:
   sonarcloud:
     name: CodeScan (Sonar Cloud)
@@ -20,6 +24,12 @@ jobs:
           java-version: '11'
           distribution: 'adopt'
 
+      - name: Login to DockerHub
+        uses: docker/login-action@v1
+        with:
+          username: ${{ secrets.dockerhub_user }}
+          password: ${{ secrets.dockerhub_token }}
+
       - name: Validate Gradle wrapper
         uses: gradle/wrapper-validation-action@e6e38bacfdf1a337459f332974bb2327a31aaf4b
 
@@ -31,10 +41,7 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.fin3_github_token }}
         run: ./gradlew build
 
-      - name: Test
-        run: ./gradlew test
-
-      - name: SonarCloud Scan
+      - name: Test and SonarCloud Scan
         env:
           SONAR_TOKEN: ${{ secrets.sonar_token }}
-        run: gradle sonarqube -DsystemProp.sonar.host.url="https://sonarcloud.io" -Dsonar.host.url="https://sonarcloud.io" -Dsonar.login=${SONAR_TOKEN} -Dsonar.organization="fin3-technologies-inc"
+        run: ./gradlew test codeCoverageReport sonarqube -DsystemProp.sonar.host.url="https://sonarcloud.io" -Dsonar.host.url="https://sonarcloud.io" -Dsonar.login=${SONAR_TOKEN} -Dsonar.organization="fin3-technologies-inc"
