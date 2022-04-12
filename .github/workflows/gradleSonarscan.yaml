@@ -39,12 +39,12 @@ jobs:
       - name: Execute Gradle build
         env:
           GITHUB_TOKEN: ${{ secrets.fin3_github_token }}
-        run: ./gradlew build
+        run: ./gradlew build -i
 
       - name: Test and SonarCloud Scan
         env:
           SONAR_TOKEN: ${{ secrets.sonar_token }}
-        run: ./gradlew test -i codeCoverageReport sonarqube -DsystemProp.sonar.host.url="https://sonarcloud.io" -Dsonar.host.url="https://sonarcloud.io" -Dsonar.login=${SONAR_TOKEN} -Dsonar.organization="fin3-technologies-inc"
+        run: ./gradlew test codeCoverageReport sonarqube -DsystemProp.sonar.host.url="https://sonarcloud.io" -Dsonar.host.url="https://sonarcloud.io" -Dsonar.login=${SONAR_TOKEN} -Dsonar.organization="fin3-technologies-inc"
 
       - name: Publish Test Report
         uses: mikepenz/action-junit-report@v3
