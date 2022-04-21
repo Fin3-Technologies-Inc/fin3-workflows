@@ -48,13 +48,6 @@ jobs:
           username: ${{ secrets.dockerhub_user }}
           password: ${{ secrets.dockerhub_token }}
 
-      - name: Setup Maven Repo Setting
-        env:
-          GITHUB_TOKEN: ${{ secrets.fin3_github_token }}
-        run: |
-          mkdir -p ~/.m2
-          echo "<settings> <servers> <server> <id>github</id> <username>$GITHUB_TOKEN</username> <password>$GITHUB_TOKEN</password> </server> </servers> </settings>" > ~/.m2/settings.xml
-
       - name: Build and push service docker
         uses: docker/build-push-action@v2
         with:
@@ -62,5 +55,3 @@ jobs:
           context: .
           push: true
           tags: fin3technologies/${{ inputs.image_name }}:${{ env.final_tag }}
-          secrets: |
-            GIT_AUTH_TOKEN=${{ secrets.fin3_github_token }}

@@ -30,7 +30,7 @@ jobs:
           java-version: 11
           server-id: github # Value of the distributionManagement/repository/id field of the pom.xml
 
-      - name: Build with Gradle
+      - name: Build jar with Gradle
         run: ./gradlew clean build -x test
         env:
           GITHUB_TOKEN: ${{ secrets.fin3_github_token }}
