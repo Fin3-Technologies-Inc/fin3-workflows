@@ -10,6 +10,8 @@ on:
         required: true
         type: string
     secrets:
+      fin3_github_token:
+        required: true
       dockerhub_user:
         required: true
       dockerhub_token:
@@ -53,3 +55,5 @@ jobs:
           context: .
           push: true
           tags: fin3technologies/${{ inputs.image_name }}:${{ env.final_tag }}
+          secrets: |
+            GIT_AUTH_TOKEN=${{ secrets.fin3_github_token }}
