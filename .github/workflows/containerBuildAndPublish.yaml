@@ -48,6 +48,12 @@ jobs:
           username: ${{ secrets.dockerhub_user }}
           password: ${{ secrets.dockerhub_token }}
 
+      - name: Setup Maven Setting
+        env:
+          GITHUB_TOKEN: ${{ secrets.fin3_github_token }}
+        run: |
+          echo "<settings> <servers> <server> <id>github</id> <username>$GITHUB_TOKEN</username> <password>$GITHUB_TOKEN</password> </server> </servers> </settings>" > ~/.m2/settings.xml
+
       - name: Build and push service docker
         uses: docker/build-push-action@v2
         with:
