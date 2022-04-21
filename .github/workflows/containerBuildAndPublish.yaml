@@ -48,7 +48,7 @@ jobs:
           username: ${{ secrets.dockerhub_user }}
           password: ${{ secrets.dockerhub_token }}
 
-      - name: Setup Maven Setting
+      - name: Setup Maven Repo Setting
         env:
           GITHUB_TOKEN: ${{ secrets.fin3_github_token }}
         run: |
