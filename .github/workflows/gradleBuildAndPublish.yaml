@@ -10,6 +10,8 @@ on:
         required: true
         type: string
     secrets:
+      fin3_github_token:
+        required: true
       dockerhub_user:
         required: true
       dockerhub_token:
@@ -30,6 +32,8 @@ jobs:
 
       - name: Build with Gradle
         run: ./gradlew clean build
+        env:
+          GITHUB_TOKEN: ${{ secrets.fin3_github_token }}
 
       - name: Upload Service Artifact
         uses: actions/upload-artifact@v2
