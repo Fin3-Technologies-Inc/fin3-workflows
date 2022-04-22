@@ -45,7 +45,7 @@ jobs:
         uses: actions/upload-artifact@v2
         with:
           name: service
-          path: application/target/application-*-SNAPSHOT.jar
+          path: target/*-SNAPSHOT.jar
 
   docker_build:
     name: Build and Push to Docker Registry
@@ -78,7 +78,7 @@ jobs:
         uses: actions/download-artifact@v2
         with:
           name: service
-          path: application/target
+          path: target
 
       - name: Build and push service docker
         uses: docker/build-push-action@v2
