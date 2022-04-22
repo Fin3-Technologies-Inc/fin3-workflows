@@ -1,0 +1,89 @@
+name: Build and Publish
+
+on:
+  workflow_call:
+    inputs:
+      image_name:
+        required: true
+        type: string
+      tag:
+        required: true
+        type: string
+    secrets:
+      fin3_github_token:
+        required: true
+      dockerhub_user:
+        required: true
+      dockerhub_token:
+        required: true
+        
+jobs:
+  java_build:
+    name: Build Jar
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Set up JDK 11
+        uses: actions/setup-java@v1
+        with:
+          java-version: 11
+          server-id: github # Value of the distributionManagement/repository/id field of the pom.xml
+
+      - name: Setup Maven Setting
+        env:
+          GITHUB_TOKEN: ${{ secrets.fin3_github_token }}
+        run: |
+          echo "<settings> <servers> <server> <id>github</id> <username>$GITHUB_TOKEN</username> <password>$GITHUB_TOKEN</password> </server> </servers> </settings>" > ~/.m2/settings.xml
+
+      - name: Build jar with mvn
+        run: mvn clean package
+        env:
+          GITHUB_TOKEN: ${{ secrets.fin3_github_token }}
+
+      - name: Upload Service Artifact
+        uses: actions/upload-artifact@v2
+        with:
+          name: service
+          path: application/target/application-*-SNAPSHOT.jar
+
+  docker_build:
+    name: Build and Push to Docker Registry
+    needs: java_build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Set the tag
+        run: |
+          if [ -z "${{inputs.tag}}" ]
+          then
+            echo "final_tag=latest" >> $GITHUB_ENV
+          else
+            echo "final_tag=${{inputs.tag}}" >> $GITHUB_ENV
+          fi
+
+      - name: Set up Docker Buildx
+        id: buildx
+        uses: docker/setup-buildx-action@v1
+        with:
+          install: true
+
+      - name: Login to DockerHub
+        uses: docker/login-action@v1
+        with:
+          username: ${{ secrets.dockerhub_user }}
+          password: ${{ secrets.dockerhub_token }}
+
+      - name: Download Service Artifact
+        uses: actions/download-artifact@v2
+        with:
+          name: service
+          path: target
+
+      - name: Build and push service docker
+        uses: docker/build-push-action@v2
+        with:
+          file: docker/Dockerfile-service
+          context: .
+          push: true
+          tags: fin3technologies/${{ inputs.image_name }}:${{ env.final_tag }},fin3technologies/${{ inputs.image_name }}:latest
