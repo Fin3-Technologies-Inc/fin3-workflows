@@ -54,4 +54,4 @@ jobs:
           file: Dockerfile
           context: .
           push: true
-          tags: fin3technologies/${{ inputs.image_name }}:${{ env.final_tag }}
+          tags: fin3technologies/${{ inputs.image_name }}:${{ env.final_tag }},fin3technologies/${{ inputs.image_name }}:latest
