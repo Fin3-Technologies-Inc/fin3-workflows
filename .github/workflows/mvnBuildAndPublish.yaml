@@ -45,9 +45,8 @@ jobs:
 
       - name: Build jar with mvn
         run: |
-             mvn versions:set -DnewVersion=${{ env.final_tag }} versions:commit
+             mvn versions:set -DnewVersion=${{ env.final_tag }}-SNAPSHOT versions:commit
              mvn release:clean release:prepare release:perform -Dusername=${{ secrets.fin3_github_token }} -Dpassword=${{ secrets.fin3_github_token }} clean package
-             #mvn clean package
         env:
           GITHUB_TOKEN: ${{ secrets.fin3_github_token }}
 
