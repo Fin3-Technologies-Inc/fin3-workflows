@@ -42,7 +42,7 @@ jobs:
         uses: actions/upload-artifact@v2
         with:
           name: service
-          path: application/build/libs/application-*-SNAPSHOT.jar
+          path: application/build/libs/application-*.jar
   
   docker_build:
     name: Build and Push to Docker Registry
