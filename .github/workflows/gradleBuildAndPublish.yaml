@@ -32,8 +32,6 @@ jobs:
 
       - name: Build jar with Gradle
         run: |
-          NEW_VERSION=`echo ${{inputs.tag}} | sed 's/^.*[^0-9]\([0-9]*\.[0-9]*\.[0-9]*\).*$/\1/'`
-          ./gradlew release -Prelease.forceVersion=$NEW_VERSION -Prelease.localOnly
           ./gradlew clean build -x test
         env:
           GITHUB_TOKEN: ${{ secrets.fin3_github_token }}
