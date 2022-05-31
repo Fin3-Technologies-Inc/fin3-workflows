@@ -16,9 +16,21 @@ on:
         required: true
       dockerhub_token:
         required: true
+      aws_fin3_account_id:
+        required: true
+      fin3_docker_sign_passwd:
+        required: true
+      awskms_docker_image_sign_key:
+        required: true
+      aws_access_key:
+        required: true
+      aws_secret_key:
+        required: true
 env:
   REGISTRY: fin3technologies
-
+  AWS_DEFAULT_REGION: us-east-1
+  AWS_DEFAULT_OUTPUT: json
+  AWS_ACCOUNT_ID: ${{ secrets.aws_fin3_account_id }}
 jobs:
   java_build:
     name: Build Jar
@@ -101,21 +113,21 @@ jobs:
           push: true
           tags: fin3technologies/${{ inputs.image_name }}:${{ env.final_tag }}
 
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-access-key-id: ${{ secrets.aws_access_key }}
+          aws-secret-access-key: ${{ secrets.aws_secret_key }}
+          aws-region: us-east-1
+
       - name: cosign-installer
         uses: Fin3-Technologies-Inc/gh-action-cosign-installer@main
         
-      - name: Write signing key to disk
-        run: |
-          echo $KEY > cosign.key
-        shell: bash
-        env:
-          KEY: ${{ secrets.FIN3_DOCKER_SIGN_PRIV_KEY }}
-      
       - name: Sign the published Docker image
         env:
-          COSIGN_PASSWORD: ${{ secrets.FIN3_DOCKER_SIGN_PASSWD }}
+          COSIGN_PASSWORD: ${{ secrets.fin3_docker_sign_passwd }}
         run: |
-          cosign sign --key cosign.key \
+          cosign sign --key ${{ secrets.awskms_docker_image_sign_key }} \
             -a "repo=${{ github.repository }}" \
             -a "auther=Fin3 Technologies Inc" \
             -a "ref=${{ github.sha }}" \
