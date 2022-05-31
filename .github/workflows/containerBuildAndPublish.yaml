@@ -16,7 +16,9 @@ on:
         required: true
       dockerhub_token:
         required: true
-        
+env:
+  REGISTRY: fin3technologies
+
 jobs:
   docker_build:
     name: Build and Push to Docker Registry
@@ -54,4 +56,18 @@ jobs:
           file: Dockerfile
           context: .
           push: true
-          tags: fin3technologies/${{ inputs.image_name }}:${{ env.final_tag }},fin3technologies/${{ inputs.image_name }}:latest
+          tags: fin3technologies/${{ inputs.image_name }}:${{ env.final_tag }}
+
+      - name: cosign-installer
+        uses: Fin3-Technologies-Inc/gh-action-cosign-installer@main
+        
+      - name: Write signing key to disk
+        run: 'echo "$KEY" > cosign.key'
+        shell: bash
+        env:
+          KEY: ${{ secrets.FIN3_DOCKER_SIGN_PRIV_KEY }}
+      
+      - name: Sign the published Docker image
+        env:
+          COSIGN_PASSWORD: ${{ secrets.FIN3_DOCKER_SIGN_PASSWD }}
+        run: cosign sign --key cosign.key ${{ env.REGISTRY }}/${{ inputs.image_name }}:${{ env.final_tag }}
