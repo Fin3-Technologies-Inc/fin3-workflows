@@ -25,6 +25,8 @@ jobs:
 
       - name: Node install dependencies
         run: npm install
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.fin3_github_token }}
 
       - name: Run unit tests
         run: npm run test
