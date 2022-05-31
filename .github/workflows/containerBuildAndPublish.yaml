@@ -62,7 +62,8 @@ jobs:
         uses: Fin3-Technologies-Inc/gh-action-cosign-installer@main
         
       - name: Write signing key to disk
-        run: 'echo "$KEY" > cosign.key'
+        run: |
+          echo $KEY > cosign.key
         shell: bash
         env:
           KEY: ${{ secrets.FIN3_DOCKER_SIGN_PRIV_KEY }}
@@ -70,4 +71,9 @@ jobs:
       - name: Sign the published Docker image
         env:
           COSIGN_PASSWORD: ${{ secrets.FIN3_DOCKER_SIGN_PASSWD }}
-        run: cosign sign --key cosign.key ${{ env.REGISTRY }}/${{ inputs.image_name }}:${{ env.final_tag }}
+        run: |
+          cosign sign --key cosign.key \
+            -a "repo=${{ github.repository }}" \
+            -a "auther=Fin3 Technologies Inc" \
+            -a "ref=${{ github.sha }}" \
+          ${{ env.REGISTRY }}/${{ inputs.image_name }}:${{ env.final_tag }}
