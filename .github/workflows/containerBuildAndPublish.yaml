@@ -40,7 +40,11 @@ jobs:
           then
             echo "final_tag=latest" >> $GITHUB_ENV
           else
+            final_majortag=`echo ${{inputs.tag}} | awk -F\. '{print $1".x"}'`
+            final_minortag=`echo ${{inputs.tag}} | awk -F\. '{print $1"."$2".x"}'`
             echo "final_tag=${{inputs.tag}}" >> $GITHUB_ENV
+            echo "final_majortag=$final_majortag" >> $GITHUB_ENV
+            echo "final_minortag=$final_minortag" >> $GITHUB_ENV
           fi
 
       - name: Set up Docker Buildx
@@ -61,7 +65,7 @@ jobs:
           file: Dockerfile
           context: .
           push: true
-          tags: fin3technologies/${{ inputs.image_name }}:${{ env.final_tag }}
+          tags: fin3technologies/${{ inputs.image_name }}:${{ env.final_tag }},fin3technologies/${{ inputs.image_name }}:${{ env.final_majortag }},fin3technologies/${{ inputs.image_name }}:${{ env.final_minortag }},fin3technologies/${{ inputs.image_name }}:latest
 
       - name: cosign-installer
         uses: Fin3-Technologies-Inc/gh-action-cosign-installer@main
