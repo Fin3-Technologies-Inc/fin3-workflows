@@ -31,6 +31,10 @@ jobs:
       - name: Run unit tests
         run: npm run test
 
+      - name: Cat Test Results
+        if: always()
+        run: cat test-report.xml
+
       - name: Publish Test Results
         uses: EnricoMi/publish-unit-test-result-action@v1
         if: always()
