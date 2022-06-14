@@ -60,16 +60,6 @@ jobs:
           password: ${{ secrets.dockerhub_token }}
 
       - name: Build and push service docker
-        if: env.final_tag == 'latest'
-        uses: docker/build-push-action@v2
-        with:
-          file: docker/Dockerfile-service
-          context: .
-          push: true
-          tags: fin3technologies/${{ inputs.image_name }}:latest
-
-      - name: Build and push service docker
-        if: env.final_tag != 'latest'
         uses: docker/build-push-action@v2
         with:
           file: docker/Dockerfile-service
