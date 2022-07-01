@@ -48,9 +48,7 @@ jobs:
       - name: Execute Gradle build
         env:
           GITHUB_TOKEN: ${{ secrets.fin3_github_token }}
-        run: |
-          cat ~/.gradle/gradle.properties
-          ./gradlew build -x test
+        run: ./gradlew build -x test
 
       - name: Test and SonarCloud Scan
         env:
