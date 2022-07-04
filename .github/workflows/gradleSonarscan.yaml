@@ -35,6 +35,15 @@ jobs:
 
       - name: Setup Gradle
         uses: gradle/gradle-build-action@v2
+
+      - name: Restore gradle.properties
+        env:
+          GRADLE_PROPERTIES: org.gradle.jvmargs=-Xmx2048m -XX:MaxPermSize=512m -XX:ReservedCodeCacheSize=128m
+        shell: bash
+        run: |
+          mkdir -p ~/.gradle/
+          echo "GRADLE_USER_HOME=${HOME}/.gradle" >> $GITHUB_ENV
+          echo "${GRADLE_PROPERTIES}" > ~/.gradle/gradle.properties
       
       - name: Execute Gradle build
         env:
